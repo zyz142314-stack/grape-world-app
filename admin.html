@@ -10,6 +10,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب — الإدارة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 /* Layout: admin control room in the farmer app's look — navy wave header, stat strip, 2-col checkerboard of section tiles, bottom tab bar, slide-up sheets for forms */
 :root {
@@ -594,6 +598,8 @@ function gwStart(session) {
 async function gwLoadAll() {
   if (!sb || !gwAuth) return;
   try {
+    const who = await sb.rpc('gw_me');
+    if (!who.error && !who.data) { gwLogout('الكود تغيّر. فوت بالكود الجديد.'); return; }
     const all = [];
     for (let from = 0; ; from += 1000) { const { data, error } = await sb.from('docs').select('col,id,data').range(from, from + 999); if (error) throw error; all.push(...data); if (data.length < 1000) break; }
     for (const k of Object.keys(D)) D[k] = [];
@@ -621,6 +627,7 @@ async function gwLogin(code, app) {
 let gwMsg = '';
 async function gwLogout(msg) { gwMsg = msg || ''; if (gwChan) { sb.removeChannel(gwChan); gwChan = null; } for (const k of Object.keys(D)) D[k] = []; ui.asStaff = ''; gwAuth = null; mode = 'login'; try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {} render(); }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && gwAuth) gwLoadAll(); });
+setInterval(async () => { if (gwAuth && sb && document.visibilityState === 'visible') { const w = await sb.rpc('gw_me'); if (!w.error && !w.data) gwLogout('الكود تغيّر. فوت بالكود الجديد.'); } }, 30000);
 window.addEventListener('online', () => { if (gwAuth) { gwLoadAll(); gwSubscribe(); } });
 function loginView() {
   return `<div class="lgw"><div class="lgw-top"><div class="logo" style="background-image:url(${IMG.logo})" role="img" aria-label="شعار"></div>

@@ -10,6 +10,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 /* Layout: single-light farmer app — navy wave header, vineyard hero, 2x2 action cards, farm banner, fixed bottom tab bar */
 :root {
@@ -404,6 +408,8 @@ function gwApply(rows) {
 async function gwLoad() {
   if (!gwOn) return;
   try {
+    const who = await sb.rpc('gw_me');
+    if (!who.error && !who.data) { gwLogout('الكود تغيّر. اطلب كود جديد من المؤسسة.'); return; }
     const all = [];
     for (let from = 0; ; from += 1000) { const { data, error } = await sb.from('docs').select('col,id,data').range(from, from+999); if (error) throw error; all.push(...data); if (data.length < 1000) break; }
     if (gwApply(all)) { gwMsg = ''; render(); }
@@ -432,6 +438,7 @@ if (GWC && window.supabase) {
   sb = window.supabase.createClient(GWC.url, GWC.key, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'gw-farmer' } });
   FARMER = { name:'', full:'', phone:'', location:'', area:'', grape:'', vines:'', irrigation:'', notes:'' }; TASKS = []; INVOICES = []; ADS = []; S.logged = false;
   document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && gwOn) gwLoad(); });
+  setInterval(async () => { if (gwOn && document.visibilityState==='visible') { const w = await sb.rpc('gw_me'); if (!w.error && !w.data) gwLogout('الكود تغيّر. اطلب كود جديد من المؤسسة.'); } }, 30000);
   window.addEventListener('online', () => { if (gwOn) { gwLoad(); gwSub(); } });
 }
 
