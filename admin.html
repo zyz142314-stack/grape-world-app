@@ -30,6 +30,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب — الإدارة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -510,6 +514,28 @@ html[data-gw="dark"] input, html[data-gw="dark"] select, html[data-gw="dark"] te
 html[data-gw="dark"] .sheet, html[data-gw="dark"] .panel, html[data-gw="dark"] .item { color: var(--ink); }
 html[data-gw="dark"] .codebox { background: #241F10; border-color: #6B5A22; }
 .themebtn svg { width: 24px !important; height: 24px !important; }
+.prog { display: grid; gap: 0; }
+.prog-card { display: flex; align-items: stretch; background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; overflow: hidden; }
+.prog-card.next { border-color: var(--green); box-shadow: 0 0 0 3px rgba(62,155,58,.15); }
+.prog-card.past { opacity: .6; }
+.prog-card.hid { border-style: dashed; }
+.prog-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: none; border: 0; text-align: right; color: inherit; }
+.prog-no { width: 40px; height: 40px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
+.prog-card.next .prog-no { background: var(--green); }
+.prog-t { flex: 1; min-width: 0; display: grid; }
+.prog-t b { font-size: 16px; color: var(--title); }
+.prog-t span { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prog-t small { color: var(--muted); font-weight: 600; }
+.prog-when { font-weight: 800; font-size: 12.5px; color: var(--green-ink); background: var(--soft); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+.prog-eye { width: 64px; border: 0; border-inline-start: 1px solid var(--line); background: var(--soft); color: var(--green-ink); display: grid; place-items: center; align-content: center; gap: 2px; font-size: 11px; font-weight: 800; }
+.prog-eye svg { width: 22px; height: 22px; }
+.prog-eye.off { color: var(--muted); }
+.prog-arrow { display: grid; place-items: center; height: 30px; color: var(--green); }
+.prog-arrow svg { width: 22px; height: 22px; }
+.prog-arrow.past { color: var(--muted); }
+.vischk { display: flex; gap: 10px; align-items: flex-start; background: var(--soft); border-radius: 14px; padding: 10px 12px; font-weight: 700; }
+.vischk input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--green); }
+.vischk em { display: block; font-style: normal; font-weight: 600; color: var(--muted); font-size: 12.5px; }
 </style>
 <script>
 const GW_TK = 'gw-theme';
@@ -575,6 +601,17 @@ const WD = ['الأحد','الإثنين','الثلاثاء','الأربعاء',
 const dayName = s => s ? WD[parse(s).getDay()] : '';
 const fmt = s => { if (!s) return '—'; const d = parse(s); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; };
 const daysTo = s => Math.round((parse(s) - parse(todayISO())) / DAY);
+const ORD = ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة','الثامنة','التاسعة','العاشرة'];
+const ordName = (kind, n) => (kind==='spray' ? 'البخّة ' : 'التسميدة ') + (ORD[n-1] || ('رقم ' + n));
+const weekTxt = s => { const n = daysTo(s); return n < 0 ? 'صارت' : n === 0 ? 'اليوم' : n === 1 ? 'بكرا' : n < 7 ? 'هالأسبوع' : n < 14 ? 'الأسبوع الجاي' : n < 21 ? 'بعد أسبوعين' : n < 28 ? 'بعد 3 أسابيع' : n < 60 ? 'بعد شهر' : `بعد ${Math.round(n/30)} أشهر`; };
+const roundsOf = kind => { const m = {}; D.tasks.filter(t => t.kind === kind).forEach(t => { const k = t.group || t.id; (m[k] = m[k] || { key: k, tasks: [] }).tasks.push(t); });
+  const rs = Object.values(m).map(r => { const t0 = r.tasks[0]; return { ...r, date: t0.date, product: t0.product || t0.type || '', photo: t0.photo, first: t0.id, hidden: r.tasks.every(t => t.hidden), n: r.tasks.length }; })
+    .sort((a,b) => a.date.localeCompare(b.date) || a.key.localeCompare(b.key));
+  const perYear = {}; rs.forEach(r => { const y = r.date.slice(0,4); perYear[y] = (perYear[y] || 0) + 1; r.no = perYear[y]; }); return rs; };
+async function putMany(col, docs) {
+  if (sb) { for (let i = 0; i < docs.length; i += 200) { const { error } = await sb.from('docs').upsert(docs.slice(i, i+200).map(d => ({ col, id: d.id, data: d }))); if (error) { gwFail(error); throw error; } } }
+  else for (const d of docs) await put(col, d.id, d);
+}
 const whenTxt = s => { const n = daysTo(s); return n===0?'اليوم':n===1?'غداً':n>1?`بعد ${n} أيام`:n===-1?'أمس':`قبل ${-n} يوم`; };
 const money = n => { const v = Math.round((+n||0)*100)/100; return '\u200E' + (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: 2 }); };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
@@ -888,12 +925,23 @@ function farmerView(fid) {
   </div>`;
 }
 function kindView(kind) {
-  const all = D.tasks.filter(t=>t.kind===kind).sort((a,b)=>a.date.localeCompare(b.date));
-  const g = { up: all.filter(t=>t.status!=='done' && !isLate(t)), late: all.filter(isLate), done: all.filter(t=>t.status==='done').reverse() };
-  const title = kind==='spray' ? 'البخّات' : 'التسميد';
+  const rs = roundsOf(kind), title = kind==='spray' ? 'برنامج البخّات' : 'برنامج التسميد';
+  const anyHidden = rs.some(r => r.hidden && daysTo(r.date) >= 0);
+  const nextKey = (rs.find(r => daysTo(r.date) >= 0) || {}).key;
   return bar(title, 'home', `<button class="iconbtn add" data-sheet="task" data-kind="${kind}" aria-label="إضافة">${I.plus}</button>`) + `<div class="screen gut">
-    <div class="seg">${[['up','القادمة'],['done','المنفّذة']].map(([k,l])=>`<button class="${ui.kindTab===k?'on':''}" data-ktab="${k}">${l} (${g[k].length})</button>`).join('')}</div>
-    <div class="list">${g[ui.kindTab].length ? g[ui.kindTab].map(taskRow).join('') : `<div class="empty">لا يوجد ${kind==='spray'?'بخّات':'تسميد'} هنا.</div>`}</div></div>`;
+    <p class="hint" style="margin:0">مرتّبة حسب الموعد. اضغط <b>👁</b> لتظهر أو تخفي البخّة عند المزارعين.</p>
+    ${anyHidden ? `<button class="btn green" data-showall="${kind}" style="margin:0">${I.check} اعرض الكل للمزارعين</button>` : ''}
+    ${rs.length ? `<div class="prog">${rs.map((r,i) => { const past = daysTo(r.date) < 0; return `
+      ${i ? `<div class="prog-arrow ${past?'past':''}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></svg></div>` : ''}
+      <div class="prog-card ${past?'past':''} ${r.key===nextKey?'next':''} ${r.hidden?'hid':''}">
+        <button class="prog-main" data-task="${esc(r.first)}">
+          <span class="prog-no">${r.no}</span>
+          <span class="prog-t"><b>${ordName(kind, r.no)}</b><span>${esc(r.product)}</span><small>${dayName(r.date)} ${fmt(r.date)} · ${r.n > 1 ? r.n + ' مزارعين' : esc(fname(r.tasks[0].farmerId))}</small></span>
+          <span class="prog-when">${past ? '✓ صارت' : weekTxt(r.date)}</span>
+        </button>
+        <button class="prog-eye ${r.hidden?'off':''}" data-vis="${esc(r.key)}" data-vkind="${kind}" aria-label="${r.hidden?'إظهار للمزارعين':'إخفاء عن المزارعين'}">${r.hidden ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 9 4.5 10 6-.4.6-1.3 1.8-2.6 3M6.3 7.6C4.4 9 3.1 10.8 2 12c1 1.5 5 6 10 6 1.6 0 3-.4 4.3-1.1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg><span>مخفية</span>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c1-1.5 5-6 10-6s9 4.5 10 6c-1 1.5-5 6-10 6S3 13.5 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span>ظاهرة</span>'}</button>
+      </div>`; }).join('')}</div>` : `<div class="empty">ما في ${kind==='spray'?'بخّات':'تسميد'} بعد. اضغط + لتضيف.</div>`}
+  </div>`;
 }
 function tasksView() {
   const q = ui.taskQ.trim();
@@ -1170,6 +1218,7 @@ function taskSheet({ kind, fid, tid }) {
   openSheet((tid?'تعديل ':'إضافة ') + (S?'بخّة':'تسميد'), `<form id="form-task" data-tid="${esc(tid||'')}" data-kind="${kind}" novalidate>
     ${tid ? farmerSelect(t.farmerId) : farmerPicks(t.farmerId)}
     ${fld('date','الموعد',t.date,'date','required')}
+    <label class="vischk"><input type="checkbox" name="showNow" ${t.hidden ? '' : 'checked'}><span>تظهر للمزارعين هلق <em>(إذا شلت الصح بتضل مخفية لحتى تعرضها)</em></span></label>
     <div class="fld"><label>صورة المنتج <em>(تظهر للمزارع)</em></label>
       <div class="upl" id="upl">${t.photo?`<img src="${esc(photoURL(t.photo))}" alt="">`:`<span style="width:44px;color:var(--navy)">${I.cam}</span><span>صوّر العلبة أو اختر صورة من الاستوديو</span>`}
         <div class="row"><label class="btn" for="photo-in">${I.cam} ${t.photo?'تغيير الصورة':'إضافة صورة'}</label>${t.photo?'<button type="button" class="btn ghost red" id="btn-rm-photo" style="width:auto">إزالة</button>':''}</div>
@@ -1481,6 +1530,10 @@ document.addEventListener('click', async e => {
   if (ds.stk) { const [k,v] = ds.stk.split(':'); ui[k] = v; render(); return; }
   if (ds.stkopen !== undefined) { ui.stockOpen = ui.stockOpen === ds.stkopen ? '' : ds.stkopen; render(); return; }
   if (ds.ktab) { ui.kindTab = ds.ktab; render(); return; }
+  if (ds.vis) { const ts = D.tasks.filter(t => (t.group || t.id) === ds.vis); const hide = !ts.every(t => t.hidden); el.disabled = true;
+    try { await putMany('tasks', ts.map(t => ({ ...t, hidden: hide, ...(hide ? {} : { shownAt: Date.now() }) }))); toast(hide ? 'انخفت عن المزارعين' : 'صارت ظاهرة عند المزارعين'); } catch (x) {} render(); return; }
+  if (ds.showall) { const ts = D.tasks.filter(t => t.kind === ds.showall && t.hidden && daysTo(t.date) >= 0); el.disabled = true;
+    try { await putMany('tasks', ts.map(t => ({ ...t, hidden: false, shownAt: Date.now() }))); toast('صارت كلها ظاهرة عند المزارعين'); } catch (x) {} render(); return; }
   if (ds.ttab) { ui.taskTab = ds.ttab; render(); return; }
   if (ds.markdone) { const t = D.tasks.find(x=>x.id===ds.markdone); await put('tasks', t.id, { ...t, status:'done', doneBy:'admin', doneAt: Date.now() }); toast('سُجّلت كمنفّذة'); return; }
   if (ds.undone) { const t = D.tasks.find(x=>x.id===ds.undone); const { doneAt, doneBy, ...rest } = t; await put('tasks', t.id, { ...rest, status:'pending' }); return; }
@@ -1574,6 +1627,7 @@ document.addEventListener('submit', async e => {
         catch(x) { return fail(x?.code==='too_large' ? 'الفيديو كبير. صوّر مقطع أقصر (أقل من 20 ميغا).' : x?.code==='unsupported_type' ? 'صيغة الفيديو غير مدعومة. استخدم MP4.' : 'ما زبط رفع الفيديو. جرّب مرة ثانية.'); }
       }
       if (fd.tanks) fd.tanks = String(Math.min(10, Math.max(1, parseInt(fd.tanks)||1)));
+      fd.hidden = !fd.showNow; delete fd.showNow;
       const dateChanged = old.date && old.date !== fd.date;
       if (form.dataset.tid) {
         await put('tasks', id, { ...old, ...fd, kind: form.dataset.kind, photo, video, updatedAt: Date.now(), ...(dateChanged ? { rescheduledAt: Date.now() } : {}) });

@@ -30,6 +30,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -297,6 +301,20 @@ html[data-gw="dark"] img.contain, html[data-gw="dark"] .logo { filter: none; }
 html[data-gw="dark"] input, html[data-gw="dark"] select, html[data-gw="dark"] textarea { background-color: var(--soft); color: var(--ink); border-color: var(--line); }
 html[data-gw="dark"] .sheet, html[data-gw="dark"] .panel, html[data-gw="dark"] .item { color: var(--ink); }
 .themebtn svg { width: 24px !important; height: 24px !important; }
+.prog { display: grid; }
+.prog-card { display: flex; align-items: center; gap: 12px; width: 100%; background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 12px 14px; text-align: right; color: var(--ink); box-shadow: 0 2px 10px rgba(11,34,80,.06); }
+.prog-card.next { border-color: var(--green); box-shadow: 0 0 0 3px rgba(62,155,58,.15); }
+.prog-card.past { opacity: .6; }
+.prog-no { width: 42px; height: 42px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 18px; flex-shrink: 0; }
+.prog-card.next .prog-no { background: var(--green); }
+.prog-t { flex: 1; min-width: 0; display: grid; }
+.prog-t b { font-size: 16px; color: var(--title); }
+.prog-t span { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.prog-t small { color: var(--muted); font-weight: 600; }
+.prog-when { font-weight: 800; font-size: 12px; color: #2B7A28; background: var(--soft); border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+.prog-arrow { display: grid; place-items: center; height: 30px; color: var(--green); }
+.prog-arrow svg { width: 22px; height: 22px; }
+.prog-arrow.past { color: var(--muted); }
 </style>
 <script>
 const GW_TK = 'gw-theme';
@@ -367,6 +385,10 @@ const money = n => '\u200E$' + (+n||0).toLocaleString('en-US', { maximumFraction
 /* sample product picture — in the real system this is the photo uploaded from the admin app */
 const productArt = (label, sub, c1, c2) => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F7FC"/><stop offset="1" stop-color="#DCE5F3"/></linearGradient><linearGradient id="b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${c2}"/><stop offset=".45" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><ellipse cx="200" cy="272" rx="110" ry="12" fill="#0B2250" opacity=".12"/><rect x="176" y="30" width="48" height="30" rx="6" fill="#0B2250"/><path d="M168 60h64v20c26 8 38 26 38 50v122a16 16 0 0 1-16 16H146a16 16 0 0 1-16-16V130c0-24 12-42 38-50z" fill="url(#b)"/><rect x="142" y="130" width="116" height="96" rx="10" fill="#fff"/><text x="200" y="172" text-anchor="middle" font-family="Arial" font-weight="700" font-size="22" fill="#0B2250">${label}</text><text x="200" y="200" text-anchor="middle" font-family="Arial" font-size="15" fill="#5A6784">${sub}</text><path d="M188 214c6-10 18-12 24 0" stroke="#3E9B3A" stroke-width="4" fill="none"/></svg>`);
 const daysTo = d => Math.round((d - today)/DAY);
+const ORD = ['الأولى','الثانية','الثالثة','الرابعة','الخامسة','السادسة','السابعة','الثامنة','التاسعة','العاشرة'];
+const ordName = (kind, n) => (kind==='spray' ? 'البخّة ' : 'التسميدة ') + (ORD[n-1] || ('رقم ' + n));
+const weekTxt = d => { const n = daysTo(d); return n < 0 ? 'صارت' : n === 0 ? 'اليوم' : n === 1 ? 'بكرا' : n < 7 ? 'هالأسبوع' : n < 14 ? 'الأسبوع الجاي' : n < 21 ? 'بعد أسبوعين' : n < 28 ? 'بعد 3 أسابيع' : n < 60 ? 'بعد شهر' : `بعد ${Math.round(n/30)} أشهر`; };
+const progOf = kind => { const per = {}; return TASKS.filter(t => t.kind === kind && !t.hidden).sort((a,b) => a.date - b.date).map(t => { const y = t.date.getFullYear(); per[y] = (per[y]||0) + 1; return { t, no: per[y] }; }); };
 const whenTxt = d => { const n = daysTo(d); return n===0?'اليوم':n===1?'غداً':n>1?`بعد ${n} أيام`:`متأخرة ${-n} يوم`; };
 
 /* ---------- sample data (what the admin app will send) ---------- */
@@ -442,7 +464,7 @@ const dOf = s => { const [y,m,d] = String(s||'').split('-').map(Number); return 
 const pURL = p => !p ? '' : /^(data:|https?:)/.test(p) ? p : '';
 function gwNotifs() {
   const since = Date.now() - 21*DAY, out = [];
-  TASKS.forEach(t => { if ((t.createdAt||0) > since) out.push({ id:'t-'+t.id, t: t.kind==='spray'?'بخّة جديدة':'تسميد جديد', b:`${t.kind==='spray'?'بخّة':'تسميد'} ${t.product||t.type||''} بتاريخ ${fmt(t.date)}`, d:new Date(t.createdAt), go:t.kind });
+  TASKS.forEach(t => { const at = t.shownAt || t.createdAt || 0; if (at > since) out.push({ id:'t-'+t.id, t: t.kind==='spray'?'بخّة جديدة':'تسميد جديد', b:`${t.kind==='spray'?'بخّة':'تسميد'} ${t.product||t.type||''} بتاريخ ${fmt(t.date)}`, d:new Date(at), go:t.kind });
     if (t.rescheduledAt && t.rescheduledAt > since) out.push({ id:'r-'+t.id+'-'+t.rescheduledAt, t:'تغيّر الموعد', b:`صار موعد ${t.kind==='spray'?'البخّة':'التسميد'} ${fmt(t.date)}`, d:new Date(t.rescheduledAt), go:t.kind }); });
   INVOICES.forEach(v => { if ((v.createdAt||0) > since) out.push({ id:'i-'+v.id, t:'فاتورة جديدة', b:`فاتورة ${v.cat==='fert'?'تسميد':'بخّة'} بقيمة ${money(v.total)}`, d:new Date(v.createdAt), go:'debts' }); });
   return out.sort((a,b)=>b.d-a.d);
@@ -452,7 +474,7 @@ function gwApply(rows) {
   if (!f) { gwLogout('الكود تغيّر. اطلب كود جديد من المؤسسة.'); return false; }
   const fd = f.data || {};
   FARMER = { name: fd.name||'', full: fd.name||'', phone: fd.phone||'', location: fd.location||'', area: fd.area||'', grape: fd.grape||'', vines: fd.vines||'', irrigation: fd.irrigation||'', notes: fd.notes||'' };
-  TASKS = rows.filter(r => r.col==='tasks').map(r => { const t = r.data||{}; return { ...t, id: r.id, date: dOf(t.date), img: pURL(t.photo), video: '' }; });
+  TASKS = rows.filter(r => r.col==='tasks' && !(r.data||{}).hidden).map(r => { const t = r.data||{}; return { ...t, id: r.id, date: dOf(t.date), img: pURL(t.photo), video: '' }; });
   INVOICES = rows.filter(r => r.col==='ledger' && (r.data||{}).source==='purchase').map(r => { const l = r.data||{};
     const items = (Array.isArray(l.items) && l.items.length ? l.items : [{ name:l.product||l.reason||'', price:+l.price||+l.amount||0, qty:+l.qty||1 }]).map(i => [i.name, +i.price||0, +i.qty||0]);
     return { id: r.id, cat: l.category==='fert'?'fert':'spray', date: dOf(l.date), items, total: +l.amount || items.reduce((a,x)=>a+x[1]*x[2],0), createdAt: l.createdAt||0 }; }).sort((a,b)=>b.date-a.date);
@@ -529,7 +551,7 @@ function home() {
   </section>
   <main class="gut">
     <div class="grid">
-      <button class="card" id="card-spray" data-go="spray">
+      <button class="card" id="card-spray" data-go="spray" ${sp?`data-id="${sp.id}"`:''}>
         <img src="${IMG.spray}" alt="">
         <h3>البخة القادمة</h3>
         <div class="sub">${I.cal}<span>${sp?fmt(sp.date):'لا يوجد'}</span></div>
@@ -540,7 +562,7 @@ function home() {
         <h3>فواتيري</h3>
         <span class="cta plain">${INVOICES.length} فواتير ${I.chev}</span>
       </button>
-      <button class="card dark" id="card-fert" data-go="fert">
+      <button class="card dark" id="card-fert" data-go="fert" ${fe?`data-id="${fe.id}"`:''}>
         <img src="${IMG.sprout}" alt="">
         <h3>التسميد القادم</h3>
         <div class="sub">${I.cal}<span>${fe?fmt(fe.date):'لا يوجد'}</span></div>
@@ -566,9 +588,23 @@ function home() {
 const bar = t => `<div class="bar gut"><button class="back" id="btn-back" data-go="home" aria-label="رجوع">${I.back}</button><h2>${t}</h2></div>`;
 const statusOf = t => (isDone(t) || daysTo(t.date) < 0) ? '<span class="status st-done">سابقة</span>' : daysTo(t.date) === 0 ? '<span class="status st-wait">اليوم</span>' : '<span class="status st-wait">قادمة</span>';
 
+function progView(kind) {
+  const P = progOf(kind), nx = nextOf(kind);
+  const title = kind==='spray' ? 'برنامج البخّات' : 'برنامج التسميد';
+  if (!P.length) return bar(title) + `<div class="gut"><div class="panel empty">ما في ${kind==='spray'?'بخّات':'تسميد'} بالبرنامج حالياً.</div></div>`;
+  return bar(title) + `<div class="screen gut" style="padding-top:14px"><div class="prog">${P.map(({t,no},i) => { const past = daysTo(t.date) < 0, isNext = nx && nx.id === t.id; return `
+    ${i ? `<div class="prog-arrow ${past?'past':''}" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></svg></div>` : ''}
+    <button class="prog-card ${past?'past':''} ${isNext?'next':''}" data-go="${kind}" data-id="${t.id}">
+      <span class="prog-no">${no}</span>
+      <span class="prog-t"><b>${ordName(kind, no)}</b><span>${esc(t.product||t.type||'')}</span><small>${WD[t.date.getDay()]} ${fmt(t.date)}</small></span>
+      <span class="prog-when">${past ? '✓ صارت' : isNext ? 'القادمة · ' + weekTxt(t.date) : weekTxt(t.date)}</span>
+    </button>`; }).join('')}</div></div>`;
+}
 function taskView(kind, id) {
-  const t = id ? TASKS.find(x=>x.id===id) : nextOf(kind);
-  const title = kind==='spray' ? 'البخة القادمة' : 'التسميد القادم';
+  if (!id) return progView(kind);
+  const t = TASKS.find(x=>x.id===id);
+  const pe = t ? progOf(kind).find(p => p.t.id === t.id) : null;
+  const title = t && nextOf(kind)?.id === t.id ? (kind==='spray' ? 'البخة القادمة' : 'التسميد القادم') : pe ? ordName(kind, pe.no) : (kind==='spray' ? 'البخّة' : 'التسميد');
   if (!t) return bar(title) + `<div class="gut"><div class="panel empty">لا توجد ${kind==='spray'?'بخّة':'عملية تسميد'} قادمة حالياً.</div></div>`;
   const rows = kind==='spray'
     ? [['المبيد / المنتج',t.product],['المادة الفعالة',t.active],['عدد الخزانات',t.tanks],['الجرعة لكل خزان',t.dose],['سعة الخزان',t.water],['طريقة الاستخدام',t.method]]
