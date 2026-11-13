@@ -34,6 +34,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب — الإدارة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -806,7 +810,7 @@ const newCode = () => { let c; do { c = String(Math.floor(100000 + Math.random()
 const nextInvoiceNo = () => 1 + Math.max(0, ...D.ledger.map(l => +l.no || 0));
 const isLate = () => false;
 const nextTask = (fid, kind) => D.tasks.filter(t => t.farmerId===fid && t.kind===kind && t.status!=='done').sort((a,b)=>a.date.localeCompare(b.date))[0];
-const statusChip = t => t.status==='done' ? '<span class="status st-done">منفّذة ✓</span>' : isLate(t) ? '<span class="status st-late">متأخرة</span>' : '<span class="status st-wait">بانتظار التنفيذ</span>';
+const statusChip = t => daysTo(t.date) < 0 ? '<span class="status st-done">صارت</span>' : `<span class="status st-wait">${weekTxt(t.date)}</span>`;
 const kindName = k => k==='spray' ? 'بخّة' : 'تسميد';
 const seenKey = 'grape-admin-seen';
 let seen = 0; try { seen = +localStorage.getItem(seenKey) || 0; } catch(e){}
@@ -837,7 +841,6 @@ function homeView() {
     <div class="logo" style="background-image:url(${IMG.logo})" role="img" aria-label="شعار"></div>
     <div class="brand"><h1>عالم العنب والزراعة</h1><p>أهلاً ${esc(me()?.name || 'صالح الحسين')}</p></div>
     ${themeBtn()}
-    <button class="bell" id="btn-bell" data-go="notifs" aria-label="الإشعارات">${I.bell}${nConf?`<span class="n">${nConf}</span>`:''}</button>
   </header>
   <svg class="wave" viewBox="0 0 400 30" preserveAspectRatio="none"><path d="M0 30V12C80 0 150 0 220 10S350 26 400 6V30Z" style="fill:var(--bg)"/></svg>
   <main class="gut home">
@@ -866,14 +869,14 @@ function homeView() {
       ${can('products')?tile('products','#C0392B', I.tag, 'الأدوية', `${D.products.length} صنف`):''}
       ${isOwner()?tile('staff','#0E7C86', I.badge, 'الموظفين', D.staff.length ? `${D.staff.length} موظف` : 'أضف موظف'):''}
     </div>
-    <div class="sec-title"><h3>القادم</h3>${up.length>3?'<button class="link" data-go="tasks">الكل</button>':''}</div>
-    <div class="list">${up.length ? up.slice(0,3).map(taskRow).join('') : '<div class="empty">ما في مواعيد قادمة.</div>'}</div>
+    ${(() => { const nx = [...(can('spray')?roundsOf('spray').map(r=>({...r,kind:'spray'})):[]), ...(can('fert')?roundsOf('fert').map(r=>({...r,kind:'fert'})):[])].filter(r => daysTo(r.date) >= 0).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+      return (can('spray')||can('fert')) ? `<div class="sec-title"><h3>القادم بالبرنامج</h3></div><div class="list">${nx.length ? nx.map(r => `<button class="item" data-go="${r.kind==='spray'?'sprays':'ferts'}"><span class="ic">${r.kind==='spray'?I.sprayT:I.leaf}</span><span class="t"><b>${ordName(r.kind, r.no)} — ${esc(r.product)}</b><span>${dayName(r.date)} ${fmt(r.date)} · ${r.n>1?r.n+' مزارعين':esc(fname(r.tasks[0].farmerId))}${r.hidden?' · مخفية':''}</span></span><span class="status st-wait">${weekTxt(r.date)}</span></button>`).join('') : '<div class="empty">ما في شي قادم بالبرنامج.</div>'}</div>` : ''; })()}
   </main>`;
 }
 function taskRow(t) {
   const pic = t.photo ? `<img src="${esc(photoURL(t.photo))}" alt="">` : `<img class="contain" src="${t.kind==='spray'?IMG.spray:IMG.sprout}" alt="" ${t.kind==='fert'?'style="background:#0B2250"':''}>`;
   return `<button class="item" data-task="${esc(t.id)}"><span class="ic">${pic}</span>
-    <span class="t"><b>${esc(fname(t.farmerId))} — ${kindName(t.kind)}</b><span>${esc(t.product||t.type||'')} · ${fmt(t.date)} · ${t.status==='done'?'منفّذة':whenTxt(t.date)}</span></span>${statusChip(t)}</button>`;
+    <span class="t"><b>${esc(fname(t.farmerId))} — ${kindName(t.kind)}</b><span>${esc(t.product||t.type||'')} · ${fmt(t.date)}${t.hidden?' · مخفية':''}</span></span>${statusChip(t)}</button>`;
 }
 function farmersView() {
   const q = ui.q.trim();
@@ -962,15 +965,11 @@ function taskView(id) {
   return bar(`${kindName(t.kind)} — ${fname(t.farmerId)}`, 'farmer', `<button class="iconbtn" data-sheet="task" data-tid="${esc(t.id)}" aria-label="تعديل">${I.edit}</button>`) + `<div class="screen gut">
     ${t.photo?`<img class="photo" src="${esc(photoURL(t.photo))}" alt="صورة المنتج">`:''}
     ${t.video?`<video class="photo" src="/_blob/${esc(t.video)}" controls playsinline preload="metadata"></video>`:''}
-    <div class="panel"><h4>الموعد ${statusChip(t)}</h4><b style="font-size:20px">${fmt(t.date)}</b> <span style="color:var(--muted)">· ${t.status==='done'?'منفّذة':whenTxt(t.date)}</span>
-      ${t.status==='done'?`<div style="margin-top:6px;color:var(--green-ink);font-weight:700">${t.doneBy==='farmer'?'أكّد المزارع التنفيذ':'سُجّلت كمنفّذة من الإدارة'}${t.doneAt?' بتاريخ '+fmt(iso(new Date(t.doneAt))):''}</div>`:''}</div>
+    <div class="panel"><h4>الموعد ${statusChip(t)}</h4><b style="font-size:20px">${fmt(t.date)}</b> <span style="color:var(--muted)">· ${weekTxt(t.date)}${t.hidden?' · مخفية عن المزارع':''}</span></div>
     <div class="panel"><h4>${t.kind==='spray'?'المواد والجرعات':'السماد والكميات'}</h4><dl class="kv">${rows.filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl></div>
     ${t.instructions?`<div class="panel"><h4>التعليمات</h4><div class="note">${esc(t.instructions)}</div></div>`:''}
     ${t.notes?`<div class="panel"><h4>ملاحظات</h4><div class="note">${esc(t.notes)}</div></div>`:''}
     <button class="btn ghost" data-preview="${esc(t.id)}" id="btn-preview">👁 شوف كيف بتطلع عند المزارع</button>
-    ${t.status==='done'
-      ? `<button class="btn ghost" data-undone="${esc(t.id)}">إرجاعها لغير منفّذة</button>`
-      : `<button class="btn green" data-markdone="${esc(t.id)}">${I.check} تسجيلها كمنفّذة</button>`}
     <div id="del-area"><button class="btn ghost red" data-askdel="task" data-tid="${esc(t.id)}">${I.trash} حذف ${kindName(t.kind)}</button></div>
   </div>`;
 }
@@ -1371,7 +1370,7 @@ function previewSheet(tid) {
     ${t.video?`<div class="panel"><h4>فيديو البخّة</h4><video class="photo" src="/_blob/${esc(t.video)}" controls playsinline preload="metadata"></video></div>`:''}
     <div class="panel"><h4>${S?'المواد والجرعات':'السماد والكميات'}</h4><dl class="kv">${rows.filter(r=>r[1]).map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl></div>
     ${t.instructions?`<div class="panel"><h4>التعليمات</h4><div class="note">${esc(t.instructions)}</div></div>`:''}
-    <div class="btn green" style="pointer-events:none">${I.check} تم التنفيذ</div></div></div>
+    </div></div>
     <p style="color:var(--muted);font-size:13px;font-weight:600;text-align:center">هيك بالضبط بتطلع البخّة بتطبيق المزارع تحت «البخة القادمة».</p>`);
 }
 /* image → compressed JPEG */
@@ -1389,7 +1388,7 @@ function compress(file, max=1000, q=.8) {
 async function smallDataURL(blob) { const f = new File([blob], 'p.jpg', { type:'image/jpeg' }); return (await compress(f, 520, .7)).preview; }
 
 /* ---------- render ---------- */
-const TABS = [['settings','الإعدادات','gear'],['debts','الفواتير','bill'],['tasks','المواعيد','calT'],['farmers','المزارعون','users'],['home','الرئيسية','home']];
+const TABS = [['settings','الإعدادات','gear'],['debts','الفواتير','bill'],['farmers','المزارعون','users'],['home','الرئيسية','home']];
 function noPermView() { return bar('ما عندك صلاحية') + `<div class="screen gut"><div class="panel empty">هالقسم مش مسموحلك.<br>اطلب من المدير يعطيك صلاحية.<button class="btn" data-go="home">${I.home} الرئيسية</button></div></div>`; }
 const tabsFor = () => TABS.filter(([k]) => k==='home' || (k==='settings' ? isOwner() : k==='debts' ? can('invoices') : k==='farmers' ? can('farmers') : k==='tasks' ? (can('spray')||can('fert')) : true));
 function render() {
