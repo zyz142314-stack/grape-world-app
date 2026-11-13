@@ -38,6 +38,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب — الإدارة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -613,6 +617,7 @@ const roundsOf = kind => { const m = {}; D.tasks.filter(t => t.kind === kind).fo
     .sort((a,b) => a.date.localeCompare(b.date) || a.key.localeCompare(b.key));
   const perYear = {}; rs.forEach(r => { const y = r.date.slice(0,4); perYear[y] = (perYear[y] || 0) + 1; r.no = perYear[y]; }); return rs; };
 async function putMany(col, docs) {
+  if (sb && (outbox.length || navigator.onLine === false)) { for (const d of docs) queueOp({ op: 'put', col, id: d.id, data: d }); docs.forEach(d => { const a = D[col], i = a.findIndex(x => x.id === d.id); if (i >= 0) a[i] = d; else a.push(d); }); saveLocal(); return; }
   if (sb) { for (let i = 0; i < docs.length; i += 200) { const { error } = await sb.from('docs').upsert(docs.slice(i, i+200).map(d => ({ col, id: d.id, data: d }))); if (error) { gwFail(error); throw error; } } }
   else for (const d of docs) await put(col, d.id, d);
 }
@@ -629,9 +634,32 @@ let db = null, assets = null, downloads = null, mode = 'loading';
 const LKEY = 'grape-admin-local-v1';
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(LKEY)); if (s) Object.assign(D, s); } catch(e){} }
 function saveLocal() { try { localStorage.setItem(LKEY, JSON.stringify(D)); } catch(e){} }
+const OKEY = 'gw-outbox';
+let outbox = (() => { try { return JSON.parse(localStorage.getItem(OKEY)) || []; } catch (e) { return []; } })();
+let gwFlushing = false, gwNoNet = false;
+const saveOutbox = () => { try { localStorage.setItem(OKEY, JSON.stringify(outbox)); } catch (e) {} };
+const isNetErr = e => navigator.onLine === false || /fetch|network|load failed|timeout|abort/i.test(String(e?.message || e || ''));
+function queueOp(op) { outbox = outbox.filter(o => !(o.col === op.col && o.id === op.id)); outbox.push(op); saveOutbox(); gwNoNet = true; }
+async function sendOp(op) { return op.op === 'put' ? sb.from('docs').upsert({ col: op.col, id: op.id, data: op.data }) : sb.from('docs').delete().match({ col: op.col, id: op.id }); }
+async function gwFlush() {
+  if (!sb || !gwAuth || gwFlushing || !outbox.length || navigator.onLine === false) return;
+  gwFlushing = true; let sent = 0;
+  try {
+    while (outbox.length) {
+      const op = outbox[0]; let r; try { r = await sendOp(op); } catch (e) { r = { error: e }; }
+      if (r.error) { if (isNetErr(r.error)) break; toast('في تعديل ما قبله السيرفر وانلغى'); }
+      outbox.shift(); saveOutbox(); sent++;
+    }
+  } finally { gwFlushing = false; }
+  if (sent && !outbox.length) { gwNoNet = false; toast('انرفع كلشي عالنت ✓'); gwLoadAll(); } else render();
+}
 async function put(col, id, data) {
   const doc = { ...data, id };
-  if (sb) { const { error } = await sb.from('docs').upsert({ col, id, data: doc }); if (error) { gwFail(error); throw error; } }
+  if (sb) {
+    if (outbox.length || navigator.onLine === false) queueOp({ op: 'put', col, id, data: doc });
+    else { let r; try { r = await sb.from('docs').upsert({ col, id, data: doc }); } catch (e) { r = { error: e }; }
+      if (r.error) { if (isNetErr(r.error)) queueOp({ op: 'put', col, id, data: doc }); else { gwFail(r.error); throw r.error; } } }
+  }
   else if (db) { await db.collection(col).doc(id).set(doc); }
   const arr = D[col]; const i = arr.findIndex(x => x.id === id);
   if (i >= 0) arr[i] = doc; else arr.push(doc);
@@ -639,7 +667,11 @@ async function put(col, id, data) {
   render();
 }
 async function del(col, id) {
-  if (sb) { const { error } = await sb.from('docs').delete().match({ col, id }); if (error) { gwFail(error); throw error; } }
+  if (sb) {
+    if (outbox.length || navigator.onLine === false) queueOp({ op: 'del', col, id });
+    else { let r; try { r = await sb.from('docs').delete().match({ col, id }); } catch (e) { r = { error: e }; }
+      if (r.error) { if (isNetErr(r.error)) queueOp({ op: 'del', col, id }); else { gwFail(r.error); throw r.error; } } }
+  }
   else if (db) await db.collection(col).doc(id).delete();
   D[col] = D[col].filter(x => x.id !== id);
   if (!db) saveLocal();
@@ -691,6 +723,7 @@ function gwStart(session) {
 }
 async function gwLoadAll() {
   if (!sb || !gwAuth) return;
+  await gwFlush();
   try {
     const who = await sb.rpc('gw_me');
     if (!who.error && !who.data) { gwLogout('الكود تغيّر. فوت بالكود الجديد.'); return; }
@@ -698,9 +731,13 @@ async function gwLoadAll() {
     for (let from = 0; ; from += 1000) { const { data, error } = await sb.from('docs').select('col,id,data').range(from, from + 999); if (error) throw error; all.push(...data); if (data.length < 1000) break; }
     for (const k of Object.keys(D)) D[k] = [];
     for (const r of all) if (D[r.col]) D[r.col].push({ ...r.data, id: r.id });
+    for (const op of outbox) { const a = D[op.col]; if (!a) continue; const i = a.findIndex(x => x.id === op.id); if (op.op === 'del') { if (i >= 0) a.splice(i, 1); } else if (i >= 0) a[i] = op.data; else a.push(op.data); }
+    gwNoNet = false; saveLocal();
     if (gwAuth.role === 'staff' && !D.staff.some(x => x.id === gwAuth.ref)) { gwLogout('الكود تغيّر أو انحذف. اطلب كود جديد من المدير.'); return; }
     mode = 'live'; render();
-  } catch (e) { mode = navigator.onLine === false ? 'offline' : 'error'; render(); }
+  } catch (e) {
+    if (isNetErr(e)) { loadLocal(); gwNoNet = true; mode = 'live'; render(); return; }
+    mode = 'error'; render(); }
 }
 function gwSubscribe() {
   if (gwChan) sb.removeChannel(gwChan);
@@ -719,10 +756,12 @@ async function gwLogin(code, app) {
   return data.session;
 }
 let gwMsg = '';
-async function gwLogout(msg) { gwMsg = msg || ''; if (gwChan) { sb.removeChannel(gwChan); gwChan = null; } for (const k of Object.keys(D)) D[k] = []; ui.asStaff = ''; gwAuth = null; mode = 'login'; try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {} render(); }
+async function gwLogout(msg) { gwMsg = msg || ''; outbox = []; saveOutbox(); try { localStorage.removeItem(LKEY); } catch (e) {} if (gwChan) { sb.removeChannel(gwChan); gwChan = null; } for (const k of Object.keys(D)) D[k] = []; ui.asStaff = ''; gwAuth = null; mode = 'login'; try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {} render(); }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && gwAuth) gwLoadAll(); });
 setInterval(async () => { if (gwAuth && sb && document.visibilityState === 'visible') { const w = await sb.rpc('gw_me'); if (!w.error && !w.data) gwLogout('الكود تغيّر. فوت بالكود الجديد.'); } }, 30000);
 window.addEventListener('online', () => { if (gwAuth) { gwLoadAll(); gwSubscribe(); } });
+window.addEventListener('offline', () => { if (gwAuth) { gwNoNet = true; render(); } });
+setInterval(() => { if (gwAuth && outbox.length && navigator.onLine !== false) gwFlush(); }, 20000);
 function loginView() {
   return `<div class="lgw"><div class="lgw-top"><div class="logo" style="background-image:url(${IMG.logo})" role="img" aria-label="شعار"></div>
     <h1>عالم العنب والزراعة</h1><p>تطبيق الإدارة</p></div>
@@ -850,6 +889,7 @@ function homeView() {
     ${mode==='slow'?'<div class="offline">جاري الاتصال بقاعدة البيانات…</div>':''}
     ${mode==='error'?'<div class="offline">تعذّر الوصول لقاعدة البيانات. أعد فتح الصفحة.</div>':''}
     ${mode==='offline'?'<div class="offline">ما في إنترنت. البيانات بتتحدّث لما يرجع النت.</div>':''}
+    ${gwAuth && (gwNoNet || outbox.length) ? `<div class="offline netq">📶 ${outbox.length ? `${outbox.length} تعديل محفوظ عالجوال — بينرفعوا عالنت لحالهن أول ما يرجع النت` : 'ما في نت — فيك تكمّل شغلك عادي، وكلشي بينحفظ وبينرفع لما يرجع النت'}</div>` : ''}
     ${mode==='loading'&&gwAuth?'<div class="offline">جاري تحميل البيانات…</div>':''}
     ${(can('spray')||can('fert')) ? `<div class="qa ${can('spray')&&can('fert')?'two':'one'}">
       ${can('spray')?`<button id="btn-home-spray" data-sheet="task" data-kind="spray"><span class="qa-ic" style="--c:#2E8B3A">${I.sprayT}</span>بخّة جديدة</button>`:''}

@@ -34,6 +34,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -489,16 +497,17 @@ async function gwLoad() {
     if (!who.error && !who.data) { gwLogout('الكود تغيّر. اطلب كود جديد من المؤسسة.'); return; }
     const all = [];
     for (let from = 0; ; from += 1000) { const { data, error } = await sb.from('docs').select('col,id,data').range(from, from+999); if (error) throw error; all.push(...data); if (data.length < 1000) break; }
-    if (gwApply(all)) { gwMsg = ''; render(); }
-  } catch (e) { toast(navigator.onLine===false ? 'ما في إنترنت. البيانات بتتحدّث لما يرجع.' : 'ما زبط تحميل البيانات.'); }
+    if (gwApply(all)) { gwMsg = ''; try { localStorage.setItem('gw-farmer-cache', JSON.stringify(all)); } catch (x) {} render(); }
+  } catch (e) { const c = gwCache(); if (c && !TASKS.length && !INVOICES.length) { gwApply(c); render(); } toast('ما في إنترنت — عم تشوف آخر نسخة محفوظة'); }
 }
 function gwSub() {
   if (gwChan) sb.removeChannel(gwChan);
   gwChan = sb.channel('docs-farmer').on('postgres_changes', { event:'*', schema:'public', table:'docs' }, () => { clearTimeout(gwT); gwT = setTimeout(gwLoad, 300); }).subscribe();
 }
-async function gwStart() { gwOn = true; S.logged = true; render(); await gwLoad(); gwSub(); }
+function gwCache() { try { return JSON.parse(localStorage.getItem('gw-farmer-cache')); } catch (e) { return null; } }
+async function gwStart() { gwOn = true; S.logged = true; const c = gwCache(); if (c) gwApply(c); render(); await gwLoad(); gwSub(); }
 async function gwLogout(msg) {
-  gwMsg = msg || ''; gwOn = false; S.logged = false; save();
+  gwMsg = msg || ''; gwOn = false; S.logged = false; save(); try { localStorage.removeItem('gw-farmer-cache'); } catch (e) {}
   if (gwChan) { sb.removeChannel(gwChan); gwChan = null; }
   TASKS = []; INVOICES = []; ADS = []; ACCT = [];
   try { await sb.auth.signOut({ scope:'local' }); } catch(e) {}
