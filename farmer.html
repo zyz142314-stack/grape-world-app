@@ -18,6 +18,14 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -580,7 +588,7 @@ function debtsView() {
   const left = Math.round((total + prev - paid)*100)/100;
   return bar('فواتيري') + `<div class="screen gut" style="padding-top:14px">
     <div class="tot main" style="display:grid;gap:8px;text-align:right;padding:16px">
-      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px">الباقي عليّ</span><b style="font-size:26px;color:var(--gold)">${money(left)}</b></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px">${left>0?'الصافي: باقي عليّ':left<0?'الصافي: إلي رصيد':'الصافي: حسابي خالص ✓'}</span><b style="font-size:26px;color:var(--gold)">${money(Math.abs(left))}</b></div>
       <div class="acc-rows"><span>الفواتير <b>${money(total)}</b></span>${prev?`<span>دين سابق <b>${money(prev)}</b></span>`:''}<span>المدفوع <b>${money(paid)}</b></span></div></div>
     ${ACCT.length ? `<div class="acc-list">${ACCT.map(x=>`<div class="acc-it ${x.type}"><span>${x.type==='payment'?'دفعة':'دين سابق'}${x.reason?' · '+esc(x.reason):''}<small>${WD[x.date.getDay()]} ${fmt(x.date)}</small></span><b>${x.type==='payment'?'−':'+'}${money(x.amount)}</b></div>`).join('')}</div>` : ''}
     <p class="lock" style="margin:0">اضغط على الفاتورة لتشوف شو فيها</p>
