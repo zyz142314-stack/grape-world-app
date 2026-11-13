@@ -1,4 +1,8 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style><script>window.GW_CFG={"url": "https://opyowgcunlsnxdhxhxuf.supabase.co", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weW93Z2N1bmxzbnhkaHhoeHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODg1MjYsImV4cCI6MjExMDA2NDUyNn0.vkwud6XBbbV0PMQKDGHE8xAPtE56rK4IhC7DGnW2chA"}</script><script src="supabase.js"></script><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="عالم العنب"><link rel="apple-touch-icon" href="apple-icon.png"><link rel="icon" href="icon.png"><link rel="manifest" href="farmer.webmanifest"><meta name="theme-color" content="#0f2a4a"></head><body><title>عالم العنب والزراعة</title>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style><script>window.GW_CFG={"url": "https://opyowgcunlsnxdhxhxuf.supabase.co", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weW93Z2N1bmxzbnhkaHhoeHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODg1MjYsImV4cCI6MjExMDA2NDUyNn0.vkwud6XBbbV0PMQKDGHE8xAPtE56rK4IhC7DGnW2chA"}</script><script src="supabase.js"></script><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="عالم العنب"><link rel="apple-touch-icon" href="apple-icon.png"><link rel="icon" href="icon.png"><link rel="manifest" href="farmer.webmanifest"><meta name="theme-color" content="#0f2a4a"></head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
@@ -15,6 +19,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+input, textarea, select, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img, video { -webkit-user-drag: none; -webkit-touch-callout: none; }
 /* Layout: single-light farmer app — navy wave header, vineyard hero, 2x2 action cards, farm banner, fixed bottom tab bar */
 :root {
   color-scheme: light;
@@ -261,7 +269,20 @@ button { cursor: pointer; }
 @keyframes rise { from { transform: translateY(14px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } .splash, .splash * { animation: none !important; transition: none !important; } }
 @media (max-width: 360px) { .brand h1 { font-size: 21px; } .card h3 { font-size: 17px; } .hero .hi h2 { font-size: 28px; } .tabs button { font-size: 12px; } }
+.acc-rows { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; font-weight: 700; color: #C9D3E8; }
+.acc-rows b { color: #fff; direction: ltr; unicode-bidi: isolate; }
+.acc-list { display: grid; gap: 8px; }
+.acc-it { display: flex; justify-content: space-between; align-items: center; background: #fff; border-radius: 14px; padding: 10px 14px; box-shadow: 0 2px 10px rgba(11,34,80,.06); font-weight: 800; }
+.acc-it small { display: block; color: #6b7a99; font-weight: 600; font-size: 12px; margin-top: 2px; }
+.acc-it b { direction: ltr; unicode-bidi: isolate; }
+.acc-it.payment b { color: #1F7A3A; } .acc-it.debt b { color: #B3261E; }
 </style>
+<script>
+['gesturestart','gesturechange','gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+let gwLastTap = 0; document.addEventListener('touchend', e => { const n = Date.now(); if (n - gwLastTap < 300 && !e.target.closest('input,textarea,select')) e.preventDefault(); gwLastTap = n; }, { passive: false });
+document.addEventListener('contextmenu', e => { if (!e.target.closest('input,textarea')) e.preventDefault(); });
+</script>
 
 <div id="root"></div>
 <div class="toast" id="toast" hidden></div>
@@ -363,6 +384,7 @@ function mountAds() {
   show(0);
 }
 const promoArt = () => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#163A7A"/><stop offset="1" stop-color="#081834"/></linearGradient></defs><rect width="900" height="500" fill="url(#g)"/><circle cx="760" cy="250" r="190" fill="#3E9B3A" opacity=".18"/><circle cx="760" cy="250" r="120" fill="#3E9B3A" opacity=".25"/><g fill="#6B3FA0"><circle cx="730" cy="210" r="34"/><circle cx="800" cy="210" r="34"/><circle cx="765" cy="268" r="34"/><circle cx="695" cy="268" r="34"/><circle cx="835" cy="268" r="34"/><circle cx="730" cy="326" r="34"/><circle cx="800" cy="326" r="34"/><circle cx="765" cy="384" r="34"/></g><path d="M765 176c0-30 20-50 50-58" stroke="#3E9B3A" stroke-width="10" fill="none" stroke-linecap="round"/><text x="560" y="150" text-anchor="end" font-family="Tahoma,Arial" font-size="38" fill="#FFD45C" font-weight="700">عرض هالأسبوع</text><text x="560" y="250" text-anchor="end" font-family="Tahoma,Arial" font-size="64" fill="#fff" font-weight="700">كبريت ميكروني</text><text x="560" y="345" text-anchor="end" font-family="Tahoma,Arial" font-size="48" fill="#fff">بـ 5$ بس</text></svg>`);
+let ACCT = [{ id:'p1', type:'payment', amount:100, date:rel(-5), reason:'نقدي' }, { id:'d0', type:'debt', amount:45, date:rel(-40), reason:'حساب قديم' }];
 let ADS = [ { type:'img', src: IMG.adimg }, { type:'video', src: IMG.advid }, { type:'img', src: promoArt() } ]; // examples until the admin's ads arrive from the shared database
 
 /* ---------- local state (per this phone, until the central database is connected) ---------- */
@@ -402,6 +424,7 @@ function gwApply(rows) {
   INVOICES = rows.filter(r => r.col==='ledger' && (r.data||{}).source==='purchase').map(r => { const l = r.data||{};
     const items = (Array.isArray(l.items) && l.items.length ? l.items : [{ name:l.product||l.reason||'', price:+l.price||+l.amount||0, qty:+l.qty||1 }]).map(i => [i.name, +i.price||0, +i.qty||0]);
     return { id: r.id, cat: l.category==='fert'?'fert':'spray', date: dOf(l.date), items, total: +l.amount || items.reduce((a,x)=>a+x[1]*x[2],0), createdAt: l.createdAt||0 }; }).sort((a,b)=>b.date-a.date);
+  ACCT = rows.filter(r => r.col==='ledger' && (r.data||{}).source!=='purchase' && ['debt','payment'].includes((r.data||{}).type)).map(r => ({ id: r.id, type: r.data.type, amount: +r.data.amount||0, date: dOf(r.data.date), reason: r.data.reason||'' })).sort((a,b)=>b.date-a.date);
   ADS = rows.filter(r => r.col==='ads' && (r.data||{}).active!==false).sort((a,b)=>((a.data||{}).order||0)-((b.data||{}).order||0)).map(r => ({ type: r.data.type==='video'?'video':'img', src: pURL(r.data.media) })).filter(a => a.src);
   return true;
 }
@@ -423,7 +446,7 @@ async function gwStart() { gwOn = true; S.logged = true; render(); await gwLoad(
 async function gwLogout(msg) {
   gwMsg = msg || ''; gwOn = false; S.logged = false; save();
   if (gwChan) { sb.removeChannel(gwChan); gwChan = null; }
-  TASKS = []; INVOICES = []; ADS = [];
+  TASKS = []; INVOICES = []; ADS = []; ACCT = [];
   try { await sb.auth.signOut({ scope:'local' }); } catch(e) {}
   loginErr = gwMsg; render();
 }
@@ -436,13 +459,13 @@ async function gwLogin(code) {
 }
 if (GWC && window.supabase) {
   sb = window.supabase.createClient(GWC.url, GWC.key, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'gw-farmer' } });
-  FARMER = { name:'', full:'', phone:'', location:'', area:'', grape:'', vines:'', irrigation:'', notes:'' }; TASKS = []; INVOICES = []; ADS = []; S.logged = false;
+  FARMER = { name:'', full:'', phone:'', location:'', area:'', grape:'', vines:'', irrigation:'', notes:'' }; TASKS = []; INVOICES = []; ADS = []; ACCT = []; S.logged = false;
   document.addEventListener('visibilitychange', () => { if (document.visibilityState==='visible' && gwOn) gwLoad(); });
   setInterval(async () => { if (gwOn && document.visibilityState==='visible') { const w = await sb.rpc('gw_me'); if (!w.error && !w.data) gwLogout('الكود تغيّر. اطلب كود جديد من المؤسسة.'); } }, 30000);
   window.addEventListener('online', () => { if (gwOn) { gwLoad(); gwSub(); } });
 }
 
-const nextOf = kind => TASKS.filter(t => t.kind===kind && !isDone(t)).sort((a,b)=>a.date-b.date)[0];
+const nextOf = kind => TASKS.filter(t => t.kind===kind && !isDone(t) && daysTo(t.date) >= 0).sort((a,b)=>a.date-b.date)[0];
 
 /* ---------- views ---------- */
 const root = document.getElementById('root');
@@ -508,7 +531,7 @@ function home() {
   </main>`;
 }
 const bar = t => `<div class="bar gut"><button class="back" id="btn-back" data-go="home" aria-label="رجوع">${I.back}</button><h2>${t}</h2></div>`;
-const statusOf = t => isDone(t) ? '<span class="status st-done">تم التنفيذ ✓</span>' : daysTo(t.date) < 0 ? '<span class="status st-late">متأخرة</span>' : '<span class="status st-wait">بانتظار التنفيذ</span>';
+const statusOf = t => (isDone(t) || daysTo(t.date) < 0) ? '<span class="status st-done">سابقة</span>' : daysTo(t.date) === 0 ? '<span class="status st-wait">اليوم</span>' : '<span class="status st-wait">قادمة</span>';
 
 function taskView(kind, id) {
   const t = id ? TASKS.find(x=>x.id===id) : nextOf(kind);
@@ -529,26 +552,23 @@ function taskView(kind, id) {
       <dl class="kv">${rows.filter(r=>r[1]).map(r=>`<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join('')}</dl></div>
     ${t.instructions?`<div class="panel"><h4>التعليمات</h4><div class="note">${esc(t.instructions)}</div></div>`:''}
     ${t.notes?`<div class="panel"><h4>ملاحظات</h4><div class="note">${esc(t.notes)}</div></div>`:''}
-    <div id="confirm-area">${done
-      ? `<button class="btn" disabled>${I.check} تم تأكيد التنفيذ${doneAt?' · '+fmt(doneAt):''}</button>`
-      : `<button class="btn" id="btn-done" data-done="${t.id}">${I.check} تم التنفيذ</button>`}</div>
   </div>`;
 }
 let taskFilter = 'up';
 function tasksView() {
   const all = TASKS.slice().sort((a,b)=>a.date-b.date);
-  const groups = { up: all.filter(t=>!isDone(t) && daysTo(t.date)>=0), late: all.filter(t=>!isDone(t) && daysTo(t.date)<0), done: all.filter(isDone).reverse() };
+  const groups = { up: all.filter(t=>!isDone(t) && daysTo(t.date)>=0), done: all.filter(t=>isDone(t) || daysTo(t.date)<0).reverse() };
+  if (!groups[taskFilter]) taskFilter = 'up';
   const list = groups[taskFilter];
   return bar('المواعيد والمهام') + `<div class="screen gut" style="padding-top:14px">
     <div class="seg" role="tablist">
       <button class="${taskFilter==='up'?'on':''}" data-filter="up">القادمة (${groups.up.length})</button>
-      <button class="${taskFilter==='late'?'on':''}" data-filter="late">المتأخرة (${groups.late.length})</button>
-      <button class="${taskFilter==='done'?'on':''}" data-filter="done">المنجزة (${groups.done.length})</button>
+      <button class="${taskFilter==='done'?'on':''}" data-filter="done">السابقة (${groups.done.length})</button>
     </div>
     <div class="list">${list.length ? list.map(t=>`
       <button class="item" data-go="${t.kind}" data-id="${t.id}">
         <span class="ic"><img src="${t.img || (t.kind==='spray'?IMG.spray:IMG.sprout)}" alt="" style="${t.img?'width:42px;height:42px;object-fit:cover;border-radius:10px':t.kind==='fert'?'background:#0B2250;border-radius:8px':''}"></span>
-        <span class="t"><b>${t.kind==='spray'?'بخّة':'تسميد'} — ${esc(t.product||t.type||'')}</b><span>${longD(t.date)} · ${isDone(t)?'منجزة':whenTxt(t.date)}</span></span>
+        <span class="t"><b>${t.kind==='spray'?'بخّة':'تسميد'} — ${esc(t.product||t.type||'')}</b><span>${longD(t.date)} · ${(isDone(t)||daysTo(t.date)<0)?'سابقة':whenTxt(t.date)}</span></span>
         ${statusOf(t)}
       </button>`).join('') : '<div class="empty">لا توجد مهام هنا.</div>'}</div>
   </div>`;
@@ -556,8 +576,13 @@ function tasksView() {
 let openInv = null;
 function debtsView() {
   const total = INVOICES.reduce((a,v)=>a+v.total,0);
+  const prev = ACCT.filter(x=>x.type==='debt').reduce((a,x)=>a+x.amount,0), paid = ACCT.filter(x=>x.type==='payment').reduce((a,x)=>a+x.amount,0);
+  const left = Math.round((total + prev - paid)*100)/100;
   return bar('فواتيري') + `<div class="screen gut" style="padding-top:14px">
-    <div class="tot main" style="display:flex;justify-content:space-between;align-items:center;text-align:right;padding:16px"><span style="font-size:15px">مجموع فواتيري</span><b style="font-size:24px;color:var(--gold)">${money(total)}</b></div>
+    <div class="tot main" style="display:grid;gap:8px;text-align:right;padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px">الباقي عليّ</span><b style="font-size:26px;color:var(--gold)">${money(left)}</b></div>
+      <div class="acc-rows"><span>الفواتير <b>${money(total)}</b></span>${prev?`<span>دين سابق <b>${money(prev)}</b></span>`:''}<span>المدفوع <b>${money(paid)}</b></span></div></div>
+    ${ACCT.length ? `<div class="acc-list">${ACCT.map(x=>`<div class="acc-it ${x.type}"><span>${x.type==='payment'?'دفعة':'دين سابق'}${x.reason?' · '+esc(x.reason):''}<small>${WD[x.date.getDay()]} ${fmt(x.date)}</small></span><b>${x.type==='payment'?'−':'+'}${money(x.amount)}</b></div>`).join('')}</div>` : ''}
     <p class="lock" style="margin:0">اضغط على الفاتورة لتشوف شو فيها</p>
     ${INVOICES.map(v => { const open = openInv===v.id; return `
       <button class="invc ${open?'open':''}" data-inv="${v.id}" aria-expanded="${open}">

@@ -1,4 +1,8 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style><script>window.GW_CFG={"url": "https://opyowgcunlsnxdhxhxuf.supabase.co", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weW93Z2N1bmxzbnhkaHhoeHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODg1MjYsImV4cCI6MjExMDA2NDUyNn0.vkwud6XBbbV0PMQKDGHE8xAPtE56rK4IhC7DGnW2chA"}</script><script src="supabase.js"></script><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="الإدارة"><link rel="apple-touch-icon" href="apple-icon.png"><link rel="icon" href="icon.png"><link rel="manifest" href="admin.webmanifest"><meta name="theme-color" content="#0f2a4a"></head><body><title>عالم العنب — الإدارة</title>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style><script>window.GW_CFG={"url": "https://opyowgcunlsnxdhxhxuf.supabase.co", "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weW93Z2N1bmxzbnhkaHhoeHVmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ0ODg1MjYsImV4cCI6MjExMDA2NDUyNn0.vkwud6XBbbV0PMQKDGHE8xAPtE56rK4IhC7DGnW2chA"}</script><script src="supabase.js"></script><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="الإدارة"><link rel="apple-touch-icon" href="apple-icon.png"><link rel="icon" href="icon.png"><link rel="manifest" href="admin.webmanifest"><meta name="theme-color" content="#0f2a4a"></head><body><title>عالم العنب — الإدارة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب — الإدارة</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
@@ -15,6 +19,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+input, textarea, select, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img, video { -webkit-user-drag: none; -webkit-touch-callout: none; }
 /* Layout: admin control room in the farmer app's look — navy wave header, stat strip, 2-col checkerboard of section tiles, bottom tab bar, slide-up sheets for forms */
 :root {
   color-scheme: light;
@@ -474,7 +482,21 @@ form { display: flex; flex-direction: column; gap: 12px; }
 .lgw-card input:focus { border-color: var(--navy); outline: none; }
 .lgw-help { margin: 0; color: var(--muted); font-size: 13.5px; font-weight: 600; text-align: center; }
 .lgw-foot { margin-top: auto; text-align: center; padding: 24px; color: var(--muted); }
+.acct { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+.acct-top { display: flex; justify-content: space-between; align-items: center; font-weight: 800; }
+.acct-top b { font-size: 24px; direction: ltr; font-variant-numeric: tabular-nums; color: var(--navy); }
+.acct-top b.neg { color: var(--red-ink); } .acct-top b.pos { color: var(--green-ink); }
+.acct-rows { display: flex; flex-wrap: wrap; gap: 6px 14px; color: var(--muted); font-weight: 700; font-size: 13.5px; }
+.acct-rows b { color: var(--ink, #12203d); direction: ltr; unicode-bidi: isolate; }
+.acct-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.acct-btns .btn { margin: 0; }
 </style>
+<script>
+['gesturestart','gesturechange','gestureend'].forEach(t => document.addEventListener(t, e => e.preventDefault(), { passive: false }));
+document.addEventListener('touchmove', e => { if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive: false });
+let gwLastTap = 0; document.addEventListener('touchend', e => { const n = Date.now(); if (n - gwLastTap < 300 && !e.target.closest('input,textarea,select')) e.preventDefault(); gwLastTap = n; }, { passive: false });
+document.addEventListener('contextmenu', e => { if (!e.target.closest('input,textarea')) e.preventDefault(); });
+</script>
 
 <div id="view"></div>
 <div id="sheet-root"></div>
@@ -701,6 +723,15 @@ const farmer = id => D.farmers.find(f => f.id === id);
 const fname = id => farmer(id)?.name || 'مزارع محذوف';
 const leftOf = l => l.type==='debt' ? Math.round(((+l.amount||0) - (+l.paid||0))*100)/100 : -(+l.amount||0);
 const balanceOf = fid => Math.round(D.ledger.filter(l => l.farmerId === fid).reduce((a,l) => a + leftOf(l), 0)*100)/100;
+const acctOf = fid => { const L = D.ledger.filter(l => l.farmerId === fid); const inv = L.filter(l => l.source === 'purchase').reduce((a,l) => a + (+l.amount||0), 0);
+  const prev = L.filter(l => l.source !== 'purchase' && l.type === 'debt').reduce((a,l) => a + (+l.amount||0), 0);
+  const paid = L.filter(l => l.type === 'payment').reduce((a,l) => a + (+l.amount||0), 0) + L.filter(l => l.type === 'debt').reduce((a,l) => a + (+l.paid||0), 0);
+  const r = x => Math.round(x*100)/100; return { inv: r(inv), prev: r(prev), paid: r(paid), left: r(inv + prev - paid) }; };
+const acctBox = (fid, withBtns) => { const a = acctOf(fid); return `<div class="acct">
+    <div class="acct-top"><span>الباقي عليه</span><b class="${a.left>0?'neg':a.left<0?'pos':''}">${money(a.left)}</b></div>
+    <div class="acct-rows"><span>الفواتير <b>${money(a.inv)}</b></span>${a.prev?`<span>دين سابق <b>${money(a.prev)}</b></span>`:''}<span>المدفوع <b>${money(a.paid)}</b></span></div>
+    ${withBtns ? `<div class="acct-btns"><button class="btn green" data-sheet="ledger" data-type="payment" data-fid="${esc(fid)}" id="btn-add-payment">${I.cash||I.plus} دفعة</button><button class="btn ghost" data-sheet="ledger" data-type="debt" data-fid="${esc(fid)}" id="btn-add-prevdebt">${I.plus} دين سابق</button></div>` : ''}
+  </div>`; };
 const totals = () => { let owed=0, paid=0; D.ledger.forEach(l => { if (l.type==='debt') { owed += +l.amount||0; paid += +l.paid||0; } else paid += +l.amount||0; }); return { owed, paid, left: Math.round((owed - paid)*100)/100 }; };
 const newCode = () => { let c; do { c = String(Math.floor(100000 + Math.random()*900000)); } while (D.farmers.some(f => f.code === c) || D.staff.some(x => x.code === c)); return c; };
 const nextInvoiceNo = () => 1 + Math.max(0, ...D.ledger.map(l => +l.no || 0));
@@ -810,7 +841,8 @@ function farmerView(fid) {
       <span class="tb-ic">${I.bill}</span>
       <span class="tb-t"><b>الفواتير</b><span>${buys.length} فاتورة${buys[0]?' · آخر وحدة '+dayName(buys[0].date):''}</span></span>
       <span class="tb-amt">${money(takenTotal)}</span>
-    </button>` : ''}
+    </button>
+    ${acctBox(fid, true)}` : ''}
     <div class="sec-title"><h3>القادم</h3></div>
     <div class="list">${nextRow(sp,'spray')}${nextRow(fe,'fert')}</div>
     <details class="fold"><summary>بيانات المزرعة</summary><dl class="kv">
@@ -864,13 +896,14 @@ function taskView(id) {
 function debtsView() {
   const inv = D.ledger.filter(l=>l.source==='purchase');
   const total = inv.reduce((a,l)=>a+ +l.amount,0);
-  const rows = D.farmers.map(f => { const mine = inv.filter(l=>l.farmerId===f.id); return { f, n: mine.length, sum: mine.reduce((a,l)=>a+ +l.amount,0) }; })
-    .filter(r => r.n).sort((a,b)=>b.sum-a.sum);
+  const rows = D.farmers.map(f => { const mine = inv.filter(l=>l.farmerId===f.id); return { f, n: mine.length, sum: mine.reduce((a,l)=>a+ +l.amount,0), a: acctOf(f.id) }; })
+    .filter(r => r.n || r.a.prev || r.a.paid).sort((a,b)=>b.a.left-a.a.left);
+  const leftAll = Math.round(rows.reduce((a,r)=>a+r.a.left,0)*100)/100;
   return bar('الفواتير') + `<div class="screen gut">
-    <div class="takensum"><span>مجموع كل الفواتير</span><b>${money(total)}</b><small>${inv.length} فاتورة · ${rows.length} مزارع</small></div>
+    <div class="takensum"><span>الباقي على الزباين</span><b>${money(leftAll)}</b><small>${inv.length} فاتورة بـ ${money(total)} · ${rows.length} مزارع</small></div>
     <div class="sec-title" style="margin-bottom:0"><h3>حسب المزارع</h3></div>
     <div class="list">${rows.length ? rows.map(r=>`<button class="item" data-go="statement" data-fid="${esc(r.f.id)}"><span class="av">${esc(initial(r.f.name))}</span>
-      <span class="t"><b>${esc(r.f.name)}</b><span>${r.n} فاتورة</span></span><span class="amt">${money(r.sum)}</span></button>`).join('') : '<div class="empty">ما في فواتير بعد. الفاتورة بتنضاف من ملف المزارع.</div>'}</div></div>`;
+      <span class="t"><b>${esc(r.f.name)}</b><span>${r.n} فاتورة · ${money(r.sum)}${r.a.paid?' · دفع '+money(r.a.paid):''}</span></span><span class="amt ${r.a.left>0?'neg':''}">${money(r.a.left)}</span></button>`).join('') : '<div class="empty">ما في فواتير بعد. الفاتورة بتنضاف من ملف المزارع.</div>'}</div></div>`;
 }
 const CATS = { spray:'بخّة', fert:'تسميد', other:'مواد أخرى' };
 const itemsOf = l => Array.isArray(l.items) && l.items.length ? l.items : (l.product ? [{ name:l.product, qty:l.qty, price:l.price, total:l.amount }] : []);
@@ -881,7 +914,7 @@ const purchaseRow = (l) => `<button class="item inv" data-sheet="purchase" data-
   <span class="t"><b>${l.no?`فاتورة ${l.no} · `:''}${esc(purchaseTitle(l))}</b><span>${dayName(l.date)} ${fmt(l.date)} · ${esc(fname(l.farmerId))} · ${itemsOf(l).length} منتج</span></span>
   <span class="amt">${money(l.amount)}</span></button>`;
 const ledgerRow = (l, bal) => `<button class="item" data-sheet="${l.source==='purchase'?'purchase':'ledger'}" data-lid="${esc(l.id)}"><span class="ic">${l.source==='purchase'?(l.category==='spray'?`<img class="contain" src="${IMG.spray}" alt="">`:I.cart):l.type==='debt'?I.bill:I.cash}</span>
-  <span class="t"><b>${l.source==='purchase'?esc(purchaseTitle(l)):l.type==='debt'?esc(l.reason||'دين'):'دفعة'+(l.reason?' — '+esc(l.reason):'')}</b><span>${esc(fname(l.farmerId))} · ${dayName(l.date)} ${fmt(l.date)}${bal!==undefined?' · الرصيد '+money(bal):''}</span></span>
+  <span class="t"><b>${l.source==='purchase'?esc(purchaseTitle(l)):l.type==='debt'?'دين سابق'+(l.reason?' — '+esc(l.reason):''):'دفعة'+(l.reason?' — '+esc(l.reason):'')}</b><span>${esc(fname(l.farmerId))} · ${dayName(l.date)} ${fmt(l.date)}${bal!==undefined?' · الرصيد '+money(bal):''}</span></span>
   ${l.source==='purchase' ? `<span class="amt">${money(l.amount)}</span>` : `<span class="amt ${l.type==='debt'?'neg':'pos'}">${l.type==='debt'?'+':'−'}${money(l.amount)}</span>`}</button>`;
 function statementView(fid) {
   const f = farmer(fid); if (!f) return bar('اللي أخذه','debts') + '<div class="screen gut"><div class="panel empty">المزارع غير موجود.</div></div>';
@@ -890,8 +923,10 @@ function statementView(fid) {
   const other = D.ledger.filter(l=>l.farmerId===fid && l.source!=='purchase');
   const byDate = {}; ents.forEach(l => (byDate[l.date] = byDate[l.date] || []).push(l));
   return bar('فواتير ' + f.name, 'farmer') + `<div class="screen gut">
-    <div class="takensum"><span>المجموع</span><b>${money(total)}</b><small>${ents.reduce((a,l)=>a+itemsOf(l).length,0)} مادة</small></div>
+    ${acctBox(fid, true)}
     <button class="btn green big-add" data-sheet="purchase" data-cat="spray" data-fid="${esc(fid)}" style="margin-top:0">${I.plus} فاتورة جديدة</button>
+    ${other.length ? `<div class="sec-title" style="margin-bottom:0"><h3>الدفعات والديون السابقة</h3></div><div class="list">${other.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.createdAt||0)-(a.createdAt||0)).map(l=>ledgerRow(l)).join('')}</div>` : ''}
+    ${ents.length ? '<div class="sec-title" style="margin-bottom:0"><h3>الفواتير</h3></div>' : ''}
     ${ents.length ? `<p class="hint">اضغط على الفاتورة لتشوف شو فيها · <b>اضغط مطوّلاً</b> لتعدّلها</p>` + ents.map(l => { const it = itemsOf(l); const open = ui.openInv === l.id; return `
       <div class="invcard ${open?'open':''}" data-toggleinv="${esc(l.id)}" data-hold="${esc(l.id)}" role="button" tabindex="0" aria-expanded="${open}">
         <div class="ich"><span class="ic">${l.category==='fert'?`<img class="contain" src="${IMG.sprout}" alt="" style="background:#0B2250">`:`<img class="contain" src="${IMG.spray}" alt="">`}</span>
@@ -1233,11 +1268,11 @@ function productSheet(pid) {
 function ledgerSheet({ type, fid, lid }) {
   const l = lid ? D.ledger.find(x=>x.id===lid) : { type, farmerId: fid, date: todayISO() };
   const debt = l.type==='debt';
-  openSheet((lid?'تعديل ':'') + (debt?'دين جديد':'تسجيل دفعة'), `<form id="form-ledger" data-lid="${esc(lid||'')}" data-type="${l.type}" novalidate>
+  openSheet(lid ? (debt?'تعديل الدين السابق':'تعديل الدفعة') : (debt?'دين سابق':'تسجيل دفعة'), `<form id="form-ledger" data-lid="${esc(lid||'')}" data-type="${l.type}" novalidate>
     ${farmerSelect(l.farmerId)}
-    ${l.farmerId?`<div class="note">الرصيد الحالي: <b class="amt">${money(balanceOf(l.farmerId))}</b></div>`:''}
+    ${l.farmerId?`<div class="note">الباقي عليه هلق: <b class="amt">${money(acctOf(l.farmerId).left)}</b></div>`:''}
     <div class="two">${fld('amount','المبلغ ($)',l.amount,'number','required min="0" step="0.01" inputmode="decimal" dir="ltr"')}${fld('date','التاريخ',l.date,'date','required')}</div>
-    ${fld('reason', debt?'سبب الدين':'ملاحظة', l.reason,'text', debt?'placeholder="مواد زراعية، رصيد سابق…"':'placeholder="نقدي، حوالة…"')}
+    ${fld('reason', debt?'ملاحظة':'ملاحظة', l.reason,'text', debt?'placeholder="دين من قبل، حساب قديم…"':'placeholder="نقدي، حوالة…"')}
     <div class="err" id="err" hidden></div>
     <button class="btn ${debt?'':'green'}" type="submit">${I.check} حفظ</button>
     ${lid?`<div id="del-area"><button type="button" class="btn ghost red" data-askdel="ledger" data-lid="${esc(lid)}">${I.trash} حذف العملية</button></div>`:''}</form>`);
@@ -1564,7 +1599,7 @@ document.addEventListener('submit', async e => {
       if (!fd.date) return fail('حدد التاريخ.');
       const id = form.dataset.lid || uid(); const old = D.ledger.find(x=>x.id===id) || { createdAt: Date.now() };
       await put('ledger', id, { ...old, ...fd, amount, type: form.dataset.type, updatedAt: Date.now() });
-      closeSheet(); toast(form.dataset.type==='debt' ? 'تم تسجيل الدين' : `تم تسجيل الدفعة — المتبقي ${money(balanceOf(fd.farmerId))}`);
+      closeSheet(); toast(form.dataset.type==='debt' ? `انسجّل الدين السابق — الباقي ${money(acctOf(fd.farmerId).left)}` : `انسجّلت الدفعة — الباقي ${money(acctOf(fd.farmerId).left)}`);
     }
   } catch(x) {
     fail(x?.code === 'quota_exceeded' ? 'امتلأت مساحة التخزين. احذف بيانات قديمة.' : 'ما زبط الحفظ. تأكد من الإنترنت وجرّب مرة ثانية.');
