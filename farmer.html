@@ -46,6 +46,10 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
+</head><body><title>عالم العنب والزراعة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&display=swap">
 <style>
 html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
 body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
@@ -327,6 +331,7 @@ html[data-gw="dark"] .sheet, html[data-gw="dark"] .panel, html[data-gw="dark"] .
 .prog-arrow { display: grid; place-items: center; height: 30px; color: var(--green); }
 .prog-arrow svg { width: 22px; height: 22px; }
 .prog-arrow.past { color: var(--muted); }
+.ad.haslink { cursor: pointer; }
 </style>
 <script>
 const GW_TK = 'gw-theme';
@@ -420,11 +425,14 @@ let INVOICES = [
 
 /* ---------- ads screen (shared) ---------- */
 let adTimer = null;
+const waLink = (num, msg) => { let d = String(num||'').replace(/\D/g,''); if (!d) return ''; if (d.startsWith('00')) d = d.slice(2); else if (d.startsWith('0')) d = '963' + d.slice(1); return 'https://wa.me/' + d + (msg ? '?text=' + encodeURIComponent(msg) : ''); };
+function openLink(u) { if (!u) return; if (location.protocol === 'file:') { location.href = u; return; } const w = window.open(u, '_blank'); if (!w) location.href = u; }
+document.addEventListener('click', e => { const box = e.target.closest('[data-ads]'); if (!box || e.target.closest('[data-addot]') || box.closest('.adprev')) return; const cur = box.querySelector('.ad.on'); const u = cur && cur.dataset.link; if (u) { e.preventDefault(); openLink(u); } });
 function adsHTML(items) {
   if (!items.length) return '';
   return `<div class="ads" data-ads>${items.map((a,k)=> a.type==='video'
-      ? `<video class="ad${k===0?' on':''}" src="${esc(a.src)}" muted playsinline preload="auto"${items.length===1?' loop':''} aria-hidden="true"></video>`
-      : `<img class="ad${k===0?' on':''}" src="${esc(a.src)}" alt="">`).join('')}
+      ? `<video class="ad${k===0?' on':''}${a.link?' haslink':''}" src="${esc(a.src)}" data-link="${esc(a.link||'')}" muted playsinline preload="auto"${items.length===1?' loop':''} aria-hidden="true"></video>`
+      : `<img class="ad${k===0?' on':''}${a.link?' haslink':''}" src="${esc(a.src)}" data-link="${esc(a.link||'')}" alt="">`).join('')}
     ${items.length>1?`<div class="ad-dots">${items.map((_,k)=>`<button type="button" class="${k===0?'on':''}" data-addot="${k}" aria-label="إعلان ${k+1}"></button>`).join('')}</div>`:''}</div>`;
 }
 function mountAds() {
@@ -491,7 +499,7 @@ function gwApply(rows) {
     const items = (Array.isArray(l.items) && l.items.length ? l.items : [{ name:l.product||l.reason||'', price:+l.price||+l.amount||0, qty:+l.qty||1 }]).map(i => [i.name, +i.price||0, +i.qty||0]);
     return { id: r.id, cat: l.category==='fert'?'fert':'spray', date: dOf(l.date), items, total: +l.amount || items.reduce((a,x)=>a+x[1]*x[2],0), createdAt: l.createdAt||0 }; }).sort((a,b)=>b.date-a.date);
   ACCT = rows.filter(r => r.col==='ledger' && (r.data||{}).source!=='purchase' && ['debt','payment'].includes((r.data||{}).type)).map(r => ({ id: r.id, type: r.data.type, amount: +r.data.amount||0, date: dOf(r.data.date), reason: r.data.reason||'' })).sort((a,b)=>b.date-a.date);
-  ADS = rows.filter(r => r.col==='ads' && (r.data||{}).active!==false).sort((a,b)=>((a.data||{}).order||0)-((b.data||{}).order||0)).map(r => ({ type: r.data.type==='video'?'video':'img', src: pURL(r.data.media) })).filter(a => a.src);
+  ADS = rows.filter(r => r.col==='ads' && (r.data||{}).active!==false).sort((a,b)=>((a.data||{}).order||0)-((b.data||{}).order||0)).map(r => ({ type: r.data.type==='video'?'video':'img', src: pURL(r.data.media), link: waLink(r.data.wa, r.data.waMsg) })).filter(a => a.src);
   return true;
 }
 async function gwLoad() {
